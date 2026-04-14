@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     print("Успешное подключение:", datetime.datetime.now())
-    return "Небольшая основа для сайта"
+    return render_template("index.html", title="Главная страница")
 
 
 if __name__ == '__main__':
