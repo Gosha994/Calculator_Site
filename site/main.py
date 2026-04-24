@@ -19,7 +19,6 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        # Проверка совпадения паролей
         if form.password.data != form.password_again.data:
             return render_template('register.html',
                                    title='Регистрация',
@@ -28,14 +27,12 @@ def register():
 
         db_sess = db_session.create_session()
 
-        # Проверка, нет ли уже пользователя с такой почтой
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html',
                                    title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
 
-        # Создание нового пользователя
         user = User(
             name=form.name.data,
             email=form.email.data,
