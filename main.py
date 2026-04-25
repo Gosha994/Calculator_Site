@@ -5,7 +5,6 @@ from data.users import User
 from forms.user import RegisterForm, LoginForm
 import datetime
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
@@ -26,6 +25,37 @@ def load_user(user_id):
 def index():
     print("Успешное подключение:", datetime.datetime.now())
     return render_template("index.html", title="Главная страница")
+
+
+@app.route("/news")
+def news():
+    print("Новостная страница", datetime.datetime.now())
+    return render_template("news.html", title="Новости")
+
+
+@app.route("/developers")
+def developers():
+    return render_template("pass.html", title="Разрабатываем...")
+
+
+@app.route("/re-help")
+def re_help():
+    return render_template("pass.html", title="Разрабатываем...")
+
+
+@app.route("/help")
+def help():
+    return render_template("pass.html", title="Разрабатываем...")
+
+
+@app.route("/progress")
+def progress():
+    return render_template("pass.html", title="Разрабатываем...")
+
+
+@app.route("/projects")
+def projects():
+    return render_template("pass.html", title="Разрабатываем...")
 
 
 # ===== Регистрация =====
