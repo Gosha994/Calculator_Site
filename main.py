@@ -7,7 +7,10 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from data import db_session
 from data.users import User
 # from data.news_model import NewsPost
+from werkzeug.utils import secure_filename
 from forms.user import RegisterForm, LoginForm, FeedbackForm, NewsForm
+from data.news import NewsPost
+from sqlalchemy.orm import joinedload
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -18,7 +21,35 @@ login_manager.init_app(app)
 
 REPORTS_FILE = "reports.json"
 
+# Конфигурация загрузки новостей
+UPLOAD_FOLDER = 'static/uploads/news'
+ALLOWED_IMAGE_EXT = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_FILE_EXT = {'pdf', 'zip', 'doc', 'docx'}
 
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+
+# Загрузка администраторов
+def load_admins():
+    # Временно: считаем администратором любого, кто зашёл (для теста)
+    return {'1111': 1}
+
+
+# Сохранение загруженных файлов
+def save_uploaded_file(file, folder, allowed_ext):
+    if file and file.filename:
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        if ext not in allowed_ext:
+            return None
+        filename = secure_filename(f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}")
+        filepath = os.path.join(folder, filename)
+        file.save(filepath)
+        return os.path.join('static', 'uploads', 'news', filename).replace('\\', '/')
+    return None
+
+
+# Жалобы пользователей
 def load_reports():
     if not os.path.exists(REPORTS_FILE):
         return []
@@ -68,10 +99,38 @@ def index():
     return render_template("index.html", title="Главная страница")
 
 
-@app.route("/news")
+@app.route("/news", methods=['GET', 'POST'])
 def news():
-    print("Новостная страница", datetime.datetime.now())
-    return render_template("news.html", title="Новости")
+    ALLOWED_ADMINISTRATORS = load_admins()
+
+    # --- Чтение новостей (отдельная сессия) ---
+    db_sess_read = db_session.create_session()
+    posts = db_sess_read.query(NewsPost).options(joinedload(NewsPost.author)).order_by(NewsPost.created_at.desc()).all()
+    db_sess_read.close()  # Закрываем сразу после чтения
+
+    form = None
+    if current_user.is_authenticated and current_user.name in ALLOWED_ADMINISTRATORS:
+        form = NewsForm()
+        if form.validate_on_submit():
+            # Сохраняем файлы
+            image_path = save_uploaded_file(form.image.data, app.config['UPLOAD_FOLDER'], ALLOWED_IMAGE_EXT)
+            file_path = save_uploaded_file(form.file.data, app.config['UPLOAD_FOLDER'], ALLOWED_FILE_EXT)
+
+            # --- Запись новости (новая сессия) ---
+            db_sess_write = db_session.create_session()
+            post = NewsPost(
+                title=form.title.data,
+                content=form.content.data,
+                image_filename=image_path,
+                file_filename=file_path,
+                author_id=current_user.id
+            )
+            db_sess_write.add(post)
+            db_sess_write.commit()
+            db_sess_write.close()
+            return redirect('/news')
+
+    return render_template("news.html", title="Новости", news=posts, form=form, can_post=(form is not None))
 
 
 @app.route("/developers")

@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, StringField, TextAreaField, SubmitField, EmailField, BooleanField
 from wtforms.validators import DataRequired
+from flask_wtf.file import FileField, FileAllowed
 
 
 class RegisterForm(FlaskForm):
@@ -27,4 +28,7 @@ class FeedbackForm(FlaskForm):
 class NewsForm(FlaskForm):
     title = StringField('Заголовок', validators=[DataRequired()])
     content = TextAreaField('Текст новости', validators=[DataRequired()])
+    image = FileField('Изображение', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'], 'Только картинки')])
+    file = FileField('Прикреплённый файл',
+                     validators=[FileAllowed(['pdf', 'zip', 'doc', 'docx'], 'Недопустимый формат')])
     submit = SubmitField('Опубликовать')
