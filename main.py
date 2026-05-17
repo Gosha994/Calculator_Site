@@ -193,7 +193,29 @@ def profile():
 
 @app.route("/projects")
 def projects():
-    return render_template("pass.html", title="Разрабатываем...")
+    # Список проетов
+    projects_list = [
+        {
+            "project_name": "Calculator Game",
+            "info": "Мета игра для вовлечения в точные науки",
+            "url": "/pass",
+            "github": "https://github.com/Gosha994/Calculator",
+            "ava": "calculator.png"
+        },
+        {
+            "project_name": "LSA Site",
+            "info": "Новостной сайт о проектах команды",
+            "url": "/",
+            "github": "https://github.com/Gosha994/Calculator_Site",
+            "ava": "lsa_site.png"
+        }
+    ]
+    return render_template("projects.html", title="Наши проекты", projects=projects_list)
+
+
+@app.route("/pass")
+def pass_link():
+    return render_template("pass.html")
 
 
 # ===== Регистрация =====
