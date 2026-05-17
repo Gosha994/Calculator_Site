@@ -188,7 +188,7 @@ def help():
 
 @app.route("/profile")
 def profile():
-    return render_template("profile.html", title="Разрабатываем...")
+    return render_template("profile.html", title="Профиль", user=current_user)
 
 
 @app.route("/projects")

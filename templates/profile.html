@@ -1,6 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Уже создаю страничку...</h1>
-<a class="text" href="/"><h3>На главную</h3></a>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-darck">
+                    <h3 class="mb-0">Профиль пользователя</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">Имя пользователя:</div>
+                        <div class="col-sm-9">{{ user.name }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">Email:</div>
+                        <div class="col-sm-9">{{ user.email }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">Дата регистрации:</div>
+                        <div class="col-sm-9">{{ user.created_date.strftime('%d.%m.%Y %H:%M') }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">О себе:</div>
+                        <div class="col-sm-9">
+                            {% if user.about %}
+                                {{ user.about }}
+                            {% else %}
+                                <span class="text-muted">Пользователь ничего не указал.</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    <a href="/" class="btn btn-primary btn-sm">На главную</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
