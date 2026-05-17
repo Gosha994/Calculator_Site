@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
@@ -18,6 +18,21 @@ def load_user(user_id):
     """Загрузка пользователя по id для Flask-Login"""
     db_sess = db_session.create_session()
     return db_sess.get(User, int(user_id))
+
+
+# ----- Подсветка активной вкладки ----
+@app.context_processor
+def inject_active_page():
+    return {'active_page': request.endpoint}
+
+
+@app.after_request
+def add_cors_headers(response):
+    # Правильная загрузка ресурсов
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    return response
 
 
 # ===== Главная страница =====
@@ -48,9 +63,9 @@ def help():
     return render_template("pass.html", title="Разрабатываем...")
 
 
-@app.route("/progress")
-def progress():
-    return render_template("pass.html", title="Разрабатываем...")
+@app.route("/profile")
+def profile():
+    return render_template("profile.html", title="Разрабатываем...")
 
 
 @app.route("/projects")
@@ -124,10 +139,22 @@ def logout():
     return redirect("/")
 
 
+# ----- Авторизация по API -----
+@app.route("/api/TMP/login", methods=['GET', 'POST'])
+def api_login(login_u, password_u):
+    pass
+
+
+@app.route("/api/TMP/logout", methods=['GET', 'POST'])
+@login_required
+def api_logout():
+    pass
+
+
 # ===== Запуск =====
 def main():
-    db_session.global_init("db/blogs.db")
-    app.run(port=8080, host='127.0.0.1')
+    db_session.global_init("db/server.db")
+    app.run(port=7000, host='0.0.0.0')
 
 
 if __name__ == '__main__':
