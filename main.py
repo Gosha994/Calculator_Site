@@ -1,9 +1,13 @@
-from flask import Flask, render_template, redirect, request
+import json
+import os
+import datetime
+
+from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
-from forms.user import RegisterForm, LoginForm
-import datetime
+# from data.news_model import NewsPost
+from forms.user import RegisterForm, LoginForm, FeedbackForm, NewsForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -11,6 +15,28 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 # Настройка Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+REPORTS_FILE = "reports.json"
+
+
+def load_reports():
+    if not os.path.exists(REPORTS_FILE):
+        return []
+    with open(REPORTS_FILE, "rt", encoding="utf-8") as f:
+        data = json.load(f)
+    return data
+
+
+def save_report(username, message):
+    reports = load_reports()
+    new_report = {
+        "username": username,
+        "message": message,
+        "date": str(datetime.datetime.now())
+    }
+    reports.append(new_report)
+    with open(REPORTS_FILE, "wt", encoding="utf-8") as f:
+        json.dump(reports, f, ensure_ascii=False, indent=4)
 
 
 @login_manager.user_loader
@@ -53,9 +79,20 @@ def developers():
     return render_template("pass.html", title="Разрабатываем...")
 
 
-@app.route("/re-help")
+@app.route("/re-help", methods=["GET", "POST"])
 def re_help():
-    return render_template("pass.html", title="Разрабатываем...")
+    if not current_user.is_authenticated:
+        return render_template("re_help.html", title="Обратная связь",
+                               form=None, message=None,
+                               need_login=True)
+
+    form = FeedbackForm()
+    sent = False
+    if form.validate_on_submit():
+        save_report(current_user.name, form.message.data)
+        sent = True
+    return render_template("re_help.html", title="Обратная связь",
+                           form=form, sent=sent, need_login=False)
 
 
 @app.route("/help")

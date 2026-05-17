@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Обратная связь</h1>
+
+{% if need_login %}
+<p>Чтобы отправить сообщение, нужно <a href="/login">войти в аккаунт</a>.</p>
+
+{% elif sent %}
+<div class="alert alert-success">
+    <h4>Сообщение отправлено!</h4>
+    <p>Первый освободившийся разработчик ответит вам как можно скорее.</p>
+</div>
+<a href="/" class="btn btn-secondary">На главную</a>
+
+{% else %}
+<p>Если у вас есть вопросы или пожелания — напишите нам. Первый освободившийся разработчик ответит вам.</p>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.message.label }}<br>
+        {{ form.message(class="form-control", rows=5, placeholder="Введите ваше сообщение...") }}<br>
+        {% for error in form.message.errors %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+</form>
+{% endif %}
+
+{% endblock %}
