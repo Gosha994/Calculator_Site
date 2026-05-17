@@ -135,7 +135,34 @@ def news():
 
 @app.route("/developers")
 def developers():
-    return render_template("pass.html", title="Разрабатываем...")
+    # Список разработчиков
+    developers_list = [
+        {
+            "name": "Лугов Святослав",
+            "role": "Программист, Основоположник идеи империи калькуляторов",
+            "nickname": "GoSha994",
+            "projects": ["Calculator Game", "LSA Site"],
+            "github": "github.com/Gosha994",
+            "ava": "gosha.png"
+        },
+        {
+            "name": "Семчик Максим",
+            "role": "Программист, Мемный арбуз",
+            "nickname": "FunnyMaxmm",
+            "projects": ["Calculator Game", "LSA Site"],
+            "github": "https://github.com/FunnyMaxmm",
+            "ava": "funnymax.png"
+        },
+        {
+            "name": "Аникин Роман",
+            "role": "Программист, Самая продуктивная креветка на диком кресле",
+            "nickname": "BaraCur4ik",
+            "projects": ["Calculator Game", "Навык Алисы (вне команды)"],
+            "github": "https://github.com/BaraCur4ik",
+            "ava": "barakurchik.png"
+        }
+    ]
+    return render_template("developers.html", title="Разработчики", developers=developers_list)
 
 
 @app.route("/re-help", methods=["GET", "POST"])
