@@ -2,11 +2,10 @@ import json
 import os
 import datetime
 
-from flask import Flask, render_template, redirect, request, abort
+from flask import Flask, render_template, redirect, request, abort, jsonify, request
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from data import db_session
 from data.users import User
-# from data.news_model import NewsPost
 from werkzeug.utils import secure_filename
 from forms.user import RegisterForm, LoginForm, FeedbackForm, NewsForm
 from data.news import NewsPost
@@ -99,6 +98,7 @@ def index():
     return render_template("index.html", title="Главная страница")
 
 
+# ----- Новости -----
 @app.route("/news", methods=['GET', 'POST'])
 def news():
     ALLOWED_ADMINISTRATORS = load_admins()
@@ -133,6 +133,7 @@ def news():
     return render_template("news.html", title="Новости", news=posts, form=form, can_post=(form is not None))
 
 
+# ----- Разработчики -----
 @app.route("/developers")
 def developers():
     # Список разработчиков
@@ -140,7 +141,7 @@ def developers():
         {
             "name": "Лугов Святослав",
             "role": "Программист, Основоположник идеи империи калькуляторов",
-            "nickname": "GoSha994",
+            "nickname": "Gosha994",
             "projects": ["Calculator Game", "LSA Site"],
             "github": "github.com/Gosha994",
             "ava": "gosha.png"
@@ -165,6 +166,7 @@ def developers():
     return render_template("developers.html", title="Разработчики", developers=developers_list)
 
 
+# ----- Обратная связь -----
 @app.route("/re-help", methods=["GET", "POST"])
 def re_help():
     if not current_user.is_authenticated:
@@ -181,16 +183,19 @@ def re_help():
                            form=form, sent=sent, need_login=False)
 
 
+# ----- Помощь (А не поможет вам никто) -----
 @app.route("/help")
 def help():
     return render_template("pass.html", title="Разрабатываем...")
 
 
+# ----- Профиль пользователя -----
 @app.route("/profile")
 def profile():
     return render_template("profile.html", title="Профиль", user=current_user)
 
 
+# ----- Проекты команды -----
 @app.route("/projects")
 def projects():
     # Список проетов
@@ -213,6 +218,7 @@ def projects():
     return render_template("projects.html", title="Наши проекты", projects=projects_list)
 
 
+# _____ Не поверите, заглушка _____
 @app.route("/pass")
 def pass_link():
     return render_template("pass.html")
@@ -286,14 +292,17 @@ def logout():
 
 # ----- Авторизация по API -----
 @app.route("/api/TMP/login", methods=['GET', 'POST'])
-def api_login(login_u, password_u):
-    pass
+def api_login():
+    # Я не успел сделать самое интересное
+    file = open("save.json")
+    return file
 
 
 @app.route("/api/TMP/logout", methods=['GET', 'POST'])
 @login_required
 def api_logout():
-    pass
+    logout_user()
+    return jsonify({"success": True, "message": "Logged out"})
 
 
 # ===== Запуск =====
@@ -304,3 +313,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# Да-да, я сидел расставлял коментарии по проекту :/ (Свят)
+# TODO: А вот чобы заметили конец хх
