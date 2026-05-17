@@ -310,7 +310,7 @@ def api_logout():
 # ===== Запуск =====
 def main():
     db_session.global_init("db/server.db")
-    app.run(port=7000, host='0.0.0.0')
+    app.run(port=5000, host='0.0.0.0')
 
 
 if __name__ == '__main__':
