@@ -31,8 +31,10 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Загрузка администраторов
 def load_admins():
-    # Временно: считаем администратором любого, кто зашёл (для теста)
-    return {'1111': 1}
+    db_sess = db_session.create_session()
+    admins = db_sess.query(User).filter(User.admin_status > 0).all()
+    db_sess.close()
+    return {admin.name: admin.admin_status for admin in admins}
 
 
 # Сохранение загруженных файлов
@@ -186,7 +188,7 @@ def re_help():
 # ----- Помощь (А не поможет вам никто) -----
 @app.route("/help")
 def help():
-    return render_template("pass.html", title="Разрабатываем...")
+    return render_template("help.html", title="Помощь")
 
 
 # ----- Профиль пользователя -----
